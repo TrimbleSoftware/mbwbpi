@@ -22,17 +22,17 @@ This script also does an initial sleep to start its data gathering on an even po
 
 Sensor output:
 
-        t0: The calculated webbulb temerature is output as sensor t0 in Celcius.
-        data0:  A flag as sensor data0 is also output with a value of 1 when the wetbulb temature is low enough for snow. The flag is output as 0 if no snow is                     possible based on the wetbulb temperature.
+        t0: The calculated wetbulb temerature is output as sensor t0 in Celcius.
+        data0:  A flag as sensor data0 is also output with a value of 1 when the wetbulb temerature is low enough for snow. The flag is output as 0 if no snow is                     possible based on the wetbulb temperature.
         data1:  An configurable "optional" sensor to output a snowmaking ranking. Possible ranking value outputs are:
                     2: good (dry snow)
                     1: marginal (wet snow)
                     0: not possible
                     
                 The rankings are based on this logic:
-                    wetbulb temp <= -7.0 °C outputs a value of 2 (good snowmaking)
-                    wetbutb temp > -7.0 °C AND wetbulb temp  <= -3.0 °C outputs a value of 1 (marginal snowmaking)
-                    wetbulb temp > -3.0 °C outputs a value of 0 (snowmaking not possible)
+                    wetbulb temerature <= -7.0 °C outputs a value of 2 (good snowmaking)
+                    wetbutb temerature > -7.0 °C AND wetbulb temp  <= -3.0 °C outputs a value of 1 (marginal snowmaking)
+                    wetbulb temerature > -3.0 °C outputs a value of 0 (snowmaking not possible)
 
 To install on your Meteobridge PRO, NANO SD, RPI3 or RPI4 Meteobridge weather server:
 
