@@ -13,13 +13,26 @@ The plugin has configurable options that are stored in the Openwrt UCI style con
     mb_cmd: The os command to extract the sensor data from Meteobridge needed to calculate the wetbulb temperature
     logfile: The location of a logfile to wite messages to
     pollsleep: The interval in seconds the sensors are polled and the sensor data is output
-    writelog: This is a flag to cause messages to be written to the logfile.
+    writelog: This is a flag to cause messages to be written to the logfile
+    snowmaking: This is a flag to cause the output of a snowmaking rank on data1 sensor
 
 See the comments in the config file for more infomation.
 
 This script also does an initial sleep to start its data gathering on an even polling time interval. For example if the polling interval is set to 60 seconds, the polling will start (and reoccure) on even minute intervals.
 
-The calculated webbulb temerature is output as sensor t0 in Celcius. A flag as sensor data0 is also output with a value of 1 when the wetbulb temature is low enough for snow. The flag is output as 0 if no snow is possible based on the wetbulb temperature.
+Sensor output:
+
+        t0: The calculated webbulb temerature is output as sensor t0 in Celcius.
+        data0:  A flag as sensor data0 is also output with a value of 1 when the wetbulb temature is low enough for snow. The flag is output as 0 if no snow is                     possible based on the wetbulb temperature.
+        data1:  An configurable "optional" sensor to output a snowmaking ranking. Possible ranking value outputs are:
+                    2: good (dry snow)
+                    1: marginal (wet snow)
+                    0: not possible
+                    
+                The rankings are based on this logic:
+                    wetbulb temp <= -7.0 °C outputs a value of 2 (good snowmaking)
+                    wetbutb temp > -7.0 °C AND wetbulb temp  <= -3.0 °C outputs a value of 1 (marginal snowmaking)
+                    wetbulb temp > -3.0 °C outputs a value of 0 (snowmaking not possible)
 
 To install on your Meteobridge PRO, NANO SD, RPI3 or RPI4 Meteobridge weather server:
 
@@ -30,6 +43,6 @@ To install on your Meteobridge PRO, NANO SD, RPI3 or RPI4 Meteobridge weather se
 5) Select the "script:mbwbpi" entry from the Plug-in: pulldown list
 6) Select the "no restart of logger when lacking data from this station" checkbox.
 7) Click on the "Save" button. (Ignore the error message the "Error (Station #x): Download of plugin script failed: No such file or directory". This seems to a superflous error and the plugin will be added to Meteobridge anyway.)
-8) Check the "System/Logging" tab to see timestamped messages written to the logfile by the plugin (if logging is enabled) or the Live "Data/Raw Sensor Data" tab to see the wetbulb tempature and snowable data flag.
+8) Check the "System/Logging" tab to see timestamped messages written to the logfile by the plugin (if logging is enabled) or the Live "Data/Raw Sensor Data" tab to see the wetbulb tempature and snowable data flag and optional snowmaking rank.
 
 For more information on Meteobridge weather server visit this page: https://www.meteobridge.com/wiki/index.php/Home
