@@ -15,7 +15,7 @@ The plugin has configurable options that are stored in the Openwrt UCI style con
     pollsleep: The interval in seconds the sensors are polled and the sensor data is output
     writelog: This is a flag to cause messages to be written to the logfile.
 
-See the comments in the config file for mare infomation.
+See the comments in the config file for more infomation.
 
 This script also does an initial sleep to start its data gathering on an even polling time interval. For example if the polling interval is set to 60 seconds, the polling will start (and reoccure) on even minute intervals.
 
