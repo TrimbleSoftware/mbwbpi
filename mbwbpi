@@ -9,5 +9,3 @@ config mbwbpi
 	option pollsleep "60"
 		# flag set to 1 to write messages to logfile, set to 0 for no logging
 	option writetolog "1"
-		# flag set to 1 to output snowmaking level (2 good, 1 marginal, 0 not possible) based on wetbulb temp, set to 0 for no snowmaking level output
-	option snowmaking "1"
