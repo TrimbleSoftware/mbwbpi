@@ -1,0 +1,194 @@
+#!/usr/bin/awk -f
+#
+#	mbwbpi.plugin		Meteobridge plugin weatherstation to calculate wetbulb temperature
+#
+#  Copyright 2021 by Fred T. Trimble (ftt@smtcpa.com)
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#	Meteobridge user-defined plugin weatherstation to calculate wet-bulb temperature from
+#	outdoor dry-bulb temperature, outdoor relative humdity and station barometric pressure as a t0 sensor.
+# Also outputs a data0 sensor flag value to indicate when snow percipitation is possible.
+#
+#	Written 17-Jan-2021 by Fred T. Trimble (ftt@smtcpa.com) and user AlaskaWX on Meteobridge forum
+#
+#	Adapted from java script code found in the source of the web page 
+#	on the NWS web site at:
+#		https://www.weather.gov/epz/wxcalc_rh
+#	
+# awk lang reference:
+#		http://www.math.utah.edu/docs/info/gawk_toc.html
+
+# function definitions
+function abs(v)
+{
+	return v < 0? -v: v
+}
+
+function esubs(ct)
+{
+	return(6.112 * exp((17.67 * ct) / (ct + 243.5)))
+}
+
+function invertedRH(es,rh)
+{
+	return (es * (rh / 100.0))
+}
+
+# calculate wetbulb temperature using Newton-Raphson interative method
+# ct: dry-bulb temp in °C
+# rh: relative humdity %
+# p:  barometric pressure mBar
+function calcwetbulb(ct,rh,p)
+{
+	Ediff = 1.0
+	Twguess = 0.0
+	incr = 10.0
+	prevsign = 1
+
+	E2 = invertedRH(esubs(ct),rh)
+
+	Ewguess = 0.0
+	Eguess = 0.0
+	cursign = 0
+
+	while(abs(Ediff) > 0.005)
+	{
+		Ewguess = esubs(Twguess)
+		Eguess = Ewguess - p * (ct - Twguess) * 0.00066 * (1 + (0.00115 * Twguess))
+		Ediff = E2 - Eguess
+
+		if(Ediff == 0.0)
+			break
+		else
+		{
+			if(Ediff < 0.0)
+			{
+				cursign = -1
+				if(cursign != prevsign)
+				{
+					prevsign = cursign
+					incr = incr / 10.0
+				}
+				else
+					incr = incr
+			}
+			else
+			{
+				cursign = 1
+				if(cursign != prevsign)
+				{
+					prevsign = cursign
+					incr = incr / 10.0
+				}
+				else
+					incr = incr
+			}
+		}
+		Twguess = Twguess + incr * prevsign
+	}
+	return(Twguess)
+}
+
+# write timestampped message to logfile ala mb style
+function writelog(path, myname, message)
+{
+	system("echo '"myname" ("strftime("%d.%m.%Y %T",systime())"): "message"' >> "path" 2>/dev/null")
+}
+
+# main program
+BEGIN
+{
+
+	myname = "mbwbpi"
+	ver = "1.0a" # version
+	snowposs = 1.2 	# threshold wetbulb temp in °C below where snow is possible
+	wb_temp = 0.0
+	exit_code = -1
+
+	# default values to use if no config file
+	mb_cmd = "wget -q -O - 'http://localhost/public/template.cgi?template=[th0temp-act]_[th0hum-act]_[thb0press-act]&contenttype=text/plain;charset=iso-8859-1'"
+	logfile = "/tmp/log/meteobridge.log"
+	pollsleep = 60
+	writetolog = 0
+
+	# read plugin config using openwrt uci
+	conf = "/tmp/mnt/data/scripts" # location of uci config file
+
+	uci = "uci -c "conf" get mbwbpi.@mbwbpi[0].mb_cmd 2>/dev/null"
+	item = ""	
+	uci | getline item
+	close(uci)
+	if(length(item) > 0)
+		mb_cmd = item
+	uci = "uci -c "conf" get mbwbpi.@mbwbpi[0].logfile 2>/dev/null"
+	item = ""	
+	uci | getline item
+	close(uci)
+	if(length(item) > 0)
+		logfile = item
+	uci = "uci -c "conf" get mbwbpi.@mbwbpi[0].pollsleep 2>/dev/null"
+	item = ""	
+	uci | getline item
+	close(uci)
+	if(length(item) > 0)
+		pollsleep = item
+	uci = "uci -c /tmp/mnt/data/scripts get mbwbpi.@mbwbpi[0].writetolog 2>/dev/null"
+	item = ""	
+	uci | getline item
+	close(uci)
+	if(length(item) > 0)
+		writetolog = item
+
+	if(writetolog)
+	{
+		writelog(logfile,myname,"wetbulb temp plugin weather station (version "ver") started.")
+		writelog(logfile,myname,"polling interval "pollsleep" seconds.")
+		writelog(logfile,myname,"mb logger command line: '"mb_cmd"'")
+	}
+
+	ssm = strftime("%S",systime()) + (strftime("%M",systime()) * 60) + (strftime("%H",systime()) * 3600) # seconds since midnight
+	if(pollsleep - ((ssm % pollsleep) > 0))
+	{
+		if(writetolog)
+				writelog(logfile,myname,"inital sleep "pollsleep - (ssm % pollsleep)" seconds.")
+
+		exit_code = system("sleep "pollsleep - (ssm % pollsleep)" && exit 27") # initial sleep
+	}
+
+	if(exit_code != 0)
+	{
+		do # main plugin infinite loop
+		{
+			mb_cmd | getline mb_raw # run os cmd to get raw data from mb
+			close(mb_cmd)
+			split(mb_raw,mb_vals, "_") # parse the raw mb data into individual elements
+			# mb_vals[1] = drybulb temp °C
+			# mb_vals[2] = rel humidity %
+			# mb_vals[3] = station baro mbar
+			wb_temp = calcwetbulb(mb_vals[1],mb_vals[2],mb_vals[3])
+			printf("t0 %1.0f\n",wb_temp * 10.0)
+# uncomment the following line to collect the source values used to calc the wetbulb temp
+#			printf("thb0 %1.0f %1.0f %1.0f\n",mb_vals[1] * 10,mb_vals[2],mb_vals[3] * 10)
+			printf("data0 %d\n",wb_temp < snowposs? 100: 0)
+			system("") # flush all i/o buffers
+			mb_raw = ""
+			ssm = strftime("%S",systime()) + (strftime("%M",systime()) * 60) + (strftime("%H",systime()) * 3600) # seconds since midnight
+			exit_code = system("sleep "pollsleep - (ssm % pollsleep)" && exit 27") # polling sleep
+
+		} while(exit_code != 0)
+	}
+}
