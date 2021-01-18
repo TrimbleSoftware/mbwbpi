@@ -12,7 +12,7 @@ The plugin has configurable options that are stored in the OpenWrt UCI style con
 
 The calculated webbulb temerature is output as sensor t0 in Celcius. A flag as sensor data0 is also output with a value of 1 when the wetbulb temature is low enough for snow. The flag is output as 0 if no snow is possible based on the wetbulb temperature.
 
-To install on your Meteobridge NANO SD or RPI3 or RPI4 Meteobridge weather server:
+To install on your Meteobridge PRO, NANO SD, RPI3 or RPI4 Meteobridge weather server:
 
 1) Download the code (two files: mbwbpi.plugin and mbwbpi) from this repository and place these files into the "Scripts" folder on your Meteobridge weather server.
 2) Edit the configuration file (mbwbpi) as needed. In most cases the defaults should work. If you need to get the sensor data from other sensors, edit the "option mb_cmd" line inside the "template=[th0temp-act]..." area to the approiate sensor names for you installation.
@@ -22,3 +22,5 @@ To install on your Meteobridge NANO SD or RPI3 or RPI4 Meteobridge weather serve
 6) Select the "no restart of logger when lacking data from this station" checkbox.
 7) Click on the "Save" button. (Ignore the error message the "Error (Station #x): Download of plugin script failed: No such file or directory". This seems to a superflous error and the plugin should be added to Meteobridge.)
 8) Check the "System/Logging" tab to see message written to the log by the plugin or the Live "Data/Raw Sensor Data" tab to see the wetbulb tempature and snowable data flag.
+
+For more information on Meteobridge weather server visit this page: https://www.meteobridge.com/wiki/index.php/Home
