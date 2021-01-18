@@ -1,5 +1,5 @@
 # uci based configuration file for meteobridge wetbulb temperature plugin weather station
-# used by awk program mbwbpi.plugin
+# used by awk program mbwbpi.plugin Ver 1.1a
 config mbwbpi
 		# os command line to read outdoor temp, outdoor humidity and indoor baro pressure data from meteobridge
 	option mb_cmd "wget -q -O - 'http://localhost/public/template.cgi?template=[th0temp-act]_[th0hum-act]_[thb0press-act]&contenttype=text/plain;charset=iso-8859-1' 2>/dev/null"

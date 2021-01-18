@@ -52,9 +52,10 @@ function invertedRH(es,rh)
 }
 
 # calculate wetbulb temperature using Newton-Raphson interative method
-# ct: dry-bulb temp in °C
-# rh: relative humdity %
-# p:  barometric pressure mBar
+# params:
+#		ct: dry-bulb temp, °C
+#		rh: relative humdity, %
+#		p:  barometric pressure, mBar
 function calcwetbulb(ct,rh,p)
 {
 	Ediff = 1.0
