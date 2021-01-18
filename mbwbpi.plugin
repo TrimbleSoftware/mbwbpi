@@ -23,7 +23,10 @@
 #	outdoor dry-bulb temperature, outdoor relative humdity and station barometric pressure as a t0 sensor.
 # Also outputs a data0 sensor flag value to indicate when snow percipitation is possible.
 #
-#	Written 17-Jan-2021 by Fred T. Trimble (ftt@smtcpa.com) and user AlaskaWX on Meteobridge forum
+#	Written 17-Jan-2021 by Fred T. Trimble Ver 1.0a (ftt@smtcpa.com) and user AlaskaWX on Meteobridge forum
+#
+#	Modified 18-Jan-2021 by Fred T. Trimble Ver 1.1a Added optional snowmaking level output based on wetbulb temp
+#				to data1 sensor. Output values: 2 good (dry snow), 1 marginal (wet snow), 0 not possible
 #
 #	Adapted from java script code found in the source of the web page 
 #	on the NWS web site at:
@@ -114,8 +117,10 @@ BEGIN
 {
 
 	myname = "mbwbpi"
-	ver = "1.0a" # version
-	snowposs = 1.2 	# threshold wetbulb temp in °C below where snow is possible
+	ver = "1.1a" # version
+	snowposs = 1.2 # threshold wetbulb temp in °C below where snow percipitation is possible
+	drysnow = -7.0 # threshold wetbulb temp in °C for good, dry snowmaking
+	wetsnow = -3.0 # threshold wetbulb temp in °C for marginal, wet snowmaking
 	wb_temp = 0.0
 	exit_code = -1
 
@@ -124,6 +129,7 @@ BEGIN
 	logfile = "/tmp/log/meteobridge.log"
 	pollsleep = 60
 	writetolog = 0
+	snowmaking = 0
 
 	# read plugin config using openwrt uci
 	conf = "/tmp/mnt/data/scripts" # location of uci config file
@@ -152,6 +158,12 @@ BEGIN
 	close(uci)
 	if(length(item) > 0)
 		writetolog = item
+	uci = "uci -c /tmp/mnt/data/scripts get mbwbpi.@mbwbpi[0].snowmaking 2>/dev/null"
+	item = ""	
+	uci | getline item
+	close(uci)
+	if(length(item) > 0)
+		snowmaking = item
 
 	if(writetolog)
 	{
@@ -184,6 +196,8 @@ BEGIN
 # uncomment the following line to collect the source values used to calc the wetbulb temp
 #			printf("thb0 %1.0f %1.0f %1.0f\n",mb_vals[1] * 10,mb_vals[2],mb_vals[3] * 10)
 			printf("data0 %d\n",wb_temp < snowposs? 100: 0)
+			if(snowmaking) # output snowmaking level?
+				printf("data1 %d\n", wb_temp <= drysnow? 200: wb_temp > drysnow && wb_temp <= wetsnow? 100: 0)
 			system("") # flush all i/o buffers
 			mb_raw = ""
 			ssm = strftime("%S",systime()) + (strftime("%M",systime()) * 60) + (strftime("%H",systime()) * 3600) # seconds since midnight
