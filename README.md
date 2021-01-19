@@ -45,4 +45,6 @@ To install on your Meteobridge PRO, NANO SD, RPI3 or RPI4 Meteobridge weather se
 7) Click on the "Save" button. (Ignore the error message the "Error (Station #x): Download of plugin script failed: No such file or directory". This seems to a superflous error and the plugin will be added to Meteobridge anyway.)
 8) Check the "System/Logging" tab to see timestamped messages written to the logfile by the plugin (if logging is enabled) or the Live "Data/Raw Sensor Data" tab to see the wetbulb tempature and snowable data flag and optional snowmaking rank.
 
+Meteobridge forum topic: https://forum.meteohub.de/viewtopic.php?f=61&t=15468
+
 For more information on Meteobridge weather server visit this page: https://www.meteobridge.com/wiki/index.php/Home
