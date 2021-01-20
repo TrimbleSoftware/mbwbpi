@@ -1,6 +1,6 @@
 MBWBPI (MeteoBridge WetBulb PlugIn)
 
-Meteobridge user defined weatherstation plugin to accurately calculate the wetbulb tempature from other Meteobridge weather sensors.
+Meteobridge user defined weatherstation plugin to accurately calculate the wetbulb tempature from other Meteobridge physical weather sensors and output data on virtual sensors that are related to the calculated wetbulb temperature. The wetbulb temerature is of particular interest to snowmaking and snow percipitation forcasting.
 
 This plugin is implemented as a rather sophisticated AWK script that uses the Newton-Raphsen iterative method to accurately calculate the wetbulb tempature from the data furnished by other Meteobridge sensors.
 
