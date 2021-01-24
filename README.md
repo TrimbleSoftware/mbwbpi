@@ -10,7 +10,7 @@ The method to calculate the wetbulb tempature is adapted from the javascript cod
 
 The plugin has configurable options that are stored in the Openwrt UCI style configuration file named "mbwbpi". The following settings are configurable:
 
-    mb_cmd: The os command to extract the sensor data from Meteobridge needed to calculate the wetbulb temperature
+    mb_cmd: The os command to extract the sensor data from Meteobridge needed to calculate the wetbulb temperature into a tab delminted list
     logfile: The location of a logfile to wite messages to
     pollsleep: The interval in seconds the sensors are polled and the sensor data is output
     writelog: This is a flag to cause messages to be written to the logfile
