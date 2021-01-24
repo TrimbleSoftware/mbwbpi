@@ -28,6 +28,9 @@
 #	Modified 18-Jan-2021 by Fred T. Trimble Ver 1.1a Added optional snowmaking level output based on wetbulb temp
 #				to data1 sensor. Output values: 2 good (dry snow), 1 marginal (wet snow), 0 not possible
 #
+# Modified 32-Jan-2021 by Fred T. Trimble Ver 1.1b Changed data delimiter from a single underscore character 
+#				to a sinble tab character. Must be represented as %09 in URLs used to get data from Meteobridge
+#
 #	Adapted from java script code found in the source of the web page 
 #	on the NWS web site at:
 #		https://www.weather.gov/epz/wxcalc_rh
@@ -41,6 +44,7 @@ function abs(v)
 	return v < 0? -v: v
 }
 
+# calculate vapor pressure
 function esubs(ct)
 {
 	return(6.112 * exp((17.67 * ct) / (ct + 243.5)))
@@ -52,10 +56,9 @@ function invertedRH(es,rh)
 }
 
 # calculate wetbulb temperature using Newton-Raphson interative method
-# params:
-#		ct: dry-bulb temp, °C
-#		rh: relative humdity, %
-#		p:  barometric pressure, mBar
+# ct: dry-bulb temp in °C
+# rh: relative humdity %
+# p:  barometric pressure mBar
 function calcwetbulb(ct,rh,p)
 {
 	Ediff = 1.0
@@ -118,7 +121,7 @@ BEGIN
 {
 
 	myname = "mbwbpi"
-	ver = "1.1a" # version
+	ver = "1.1b" # version
 	snowposs = 1.2 # threshold wetbulb temp in °C below where snow percipitation is possible
 	drysnow = -7.0 # threshold wetbulb temp in °C for good, dry snowmaking
 	wetsnow = -3.0 # threshold wetbulb temp in °C for marginal, wet snowmaking
@@ -126,7 +129,8 @@ BEGIN
 	exit_code = -1
 
 	# default values to use if no config file
-	mb_cmd = "wget -q -O - 'http://localhost/public/template.cgi?template=[th0temp-act]_[th0hum-act]_[thb0press-act]&contenttype=text/plain;charset=iso-8859-1'"
+	# the os command used to return a tab (the %09 in the ULR) delimited list of temp, humidity and station baro pressure
+	mb_cmd = "wget -q -O - 'http://localhost/public/template.cgi?template=[th0temp-act]%09[th0hum-act%09[thb0press-act]&contenttype=text/plain;charset=iso-8859-1'"
 	logfile = "/tmp/log/meteobridge.log"
 	pollsleep = 60
 	writetolog = 0
@@ -188,7 +192,7 @@ BEGIN
 		{
 			mb_cmd | getline mb_raw # run os cmd to get raw data from mb
 			close(mb_cmd)
-			split(mb_raw,mb_vals, "_") # parse the raw mb data into individual elements
+			split(mb_raw,mb_vals, "\t") # parse the tab delimited raw data into individual elements
 			# mb_vals[1] = drybulb temp °C
 			# mb_vals[2] = rel humidity %
 			# mb_vals[3] = station baro mbar
