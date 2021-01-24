@@ -28,7 +28,7 @@
 #	Modified 18-Jan-2021 by Fred T. Trimble Ver 1.1a Added optional snowmaking level output based on wetbulb temp
 #				to data1 sensor. Output values: 2 good (dry snow), 1 marginal (wet snow), 0 not possible
 #
-# Modified 32-Jan-2021 by Fred T. Trimble Ver 1.1b Changed data delimiter from a single underscore character 
+#	Modified 23-Jan-2021 by Fred T. Trimble Ver 1.1b Changed data delimiter from a single underscore character 
 #				to a sinble tab character. Must be represented as %09 in URLs used to get data from Meteobridge
 #
 #	Adapted from java script code found in the source of the web page 
