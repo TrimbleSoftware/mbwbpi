@@ -1,2 +1,4 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+* text eol=LF
+*.plugin text eol=LF
+*.sh text eol=lf
+
