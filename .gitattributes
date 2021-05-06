@@ -1,4 +1,4 @@
 * text eol=LF
 *.plugin text eol=LF
-*.sh text eol=lf
+*.sh text eol=LF
 
