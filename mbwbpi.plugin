@@ -140,31 +140,31 @@ BEGIN {
 	# read plugin config using openwrt uci
 	conf = "/tmp/mnt/data/scripts" # location of uci config file
 
-	uci = "uci -c "conf" get "myname".@mbwbpi[0].mb_cmd 2>/dev/null"
+	uci = "uci -c "conf" get "myname".@"myname"[0].mb_cmd 2>/dev/null"
 	item = ""	
 	uci | getline item
 	close(uci)
 	if(length(item) > 0)
 		mb_cmd = item
-	uci = "uci -c "conf" get "myname".@mbwbpi[0].logfile 2>/dev/null"
+	uci = "uci -c "conf" get "myname".@"myname"[0].logfile 2>/dev/null"
 	item = ""	
 	uci | getline item
 	close(uci)
 	if(length(item) > 0)
 		logfile = item
-	uci = "uci -c "conf" get "myname".@mbwbpi[0].pollsleep 2>/dev/null"
+	uci = "uci -c "conf" get "myname".@"myname"[0].pollsleep 2>/dev/null"
 	item = ""	
 	uci | getline item
 	close(uci)
 	if(length(item) > 0)
 		pollsleep = item + 0.0
-	uci = "uci -c /tmp/mnt/data/scripts get "myname".@mbwbpi[0].writetolog 2>/dev/null"
+	uci = "uci -c /tmp/mnt/data/scripts get "myname".@"myname"[0].writetolog 2>/dev/null"
 	item = ""	
 	uci | getline item
 	close(uci)
 	if(length(item) > 0)
 		writetolog = item + 0.0
-	uci = "uci -c /tmp/mnt/data/scripts get "myname".@mbwbpi[0].snowmaking 2>/dev/null"
+	uci = "uci -c /tmp/mnt/data/scripts get "myname".@"myname"[0].snowmaking 2>/dev/null"
 	item = ""	
 	uci | getline item
 	close(uci)
