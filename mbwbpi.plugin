@@ -31,6 +31,8 @@
 #	Modified 23-Jan-2021 by Fred T. Trimble Ver 1.1b Changed data delimiter from a single underscore character 
 #				to a sinble tab character. Must be represented as %09 in URLs used to get data from Meteobridge
 #
+#	Modified 07-May-2021 by Fred T. Trimble Ver 1.1c Cleaned up code 
+#
 #	Adapted from java script code found in the source of the web page 
 #	on the NWS web site at:
 #		https://www.weather.gov/epz/wxcalc_rh
@@ -50,7 +52,7 @@ function esubs(ct)
 	return(6.112 * exp((17.67 * ct) / (ct + 243.5)))
 }
 
-function invertedRH(es,rh)
+function invertedRH(es, rh)
 {
 	return (es * (rh / 100.0))
 }
@@ -59,7 +61,7 @@ function invertedRH(es,rh)
 # ct: dry-bulb temp in °C
 # rh: relative humdity %
 # p:  barometric pressure mBar
-function calcwetbulb(ct,rh,p)
+function calcwetbulb(ct, rh, p)
 {
 	Ediff = 1.0
 	Twguess = 0.0
@@ -111,17 +113,16 @@ function calcwetbulb(ct,rh,p)
 }
 
 # write timestampped message to logfile ala mb style
-function writelog(path, myname, message)
+function writelog(path, name, message)
 {
-	system("echo '"myname" ("strftime("%d.%m.%Y %T",systime())"): "message"' >> "path" 2>/dev/null")
+	system("echo '"name" ("strftime("%d.%m.%Y %T",systime())"): "message"' >> "path" 2>/dev/null")
 }
 
 # main program
-BEGIN
-{
+BEGIN {
 
 	myname = "mbwbpi"
-	ver = "1.1b" # version
+	ver = "1.1c" # version
 	snowposs = 1.2 # threshold wetbulb temp in °C below where snow percipitation is possible
 	drysnow = -7.0 # threshold wetbulb temp in °C for good, dry snowmaking
 	wetsnow = -3.0 # threshold wetbulb temp in °C for marginal, wet snowmaking
@@ -139,36 +140,36 @@ BEGIN
 	# read plugin config using openwrt uci
 	conf = "/tmp/mnt/data/scripts" # location of uci config file
 
-	uci = "uci -c "conf" get mbwbpi.@mbwbpi[0].mb_cmd 2>/dev/null"
+	uci = "uci -c "conf" get "myname".@mbwbpi[0].mb_cmd 2>/dev/null"
 	item = ""	
 	uci | getline item
 	close(uci)
 	if(length(item) > 0)
 		mb_cmd = item
-	uci = "uci -c "conf" get mbwbpi.@mbwbpi[0].logfile 2>/dev/null"
+	uci = "uci -c "conf" get "myname".@mbwbpi[0].logfile 2>/dev/null"
 	item = ""	
 	uci | getline item
 	close(uci)
 	if(length(item) > 0)
 		logfile = item
-	uci = "uci -c "conf" get mbwbpi.@mbwbpi[0].pollsleep 2>/dev/null"
+	uci = "uci -c "conf" get "myname".@mbwbpi[0].pollsleep 2>/dev/null"
 	item = ""	
 	uci | getline item
 	close(uci)
 	if(length(item) > 0)
-		pollsleep = item
-	uci = "uci -c /tmp/mnt/data/scripts get mbwbpi.@mbwbpi[0].writetolog 2>/dev/null"
+		pollsleep = item + 0.0
+	uci = "uci -c /tmp/mnt/data/scripts get "myname".@mbwbpi[0].writetolog 2>/dev/null"
 	item = ""	
 	uci | getline item
 	close(uci)
 	if(length(item) > 0)
-		writetolog = item
-	uci = "uci -c /tmp/mnt/data/scripts get mbwbpi.@mbwbpi[0].snowmaking 2>/dev/null"
+		writetolog = item + 0.0
+	uci = "uci -c /tmp/mnt/data/scripts get "myname".@mbwbpi[0].snowmaking 2>/dev/null"
 	item = ""	
 	uci | getline item
 	close(uci)
 	if(length(item) > 0)
-		snowmaking = item
+		snowmaking = item + 0.0
 
 	if(writetolog)
 	{
